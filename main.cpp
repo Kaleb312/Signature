@@ -35,7 +35,14 @@ int main(int argc, char* argv[])
 //    inputFileName = argv[1];
 //    outputFileName = argv[2];
     FileReader fileReader;
-    fileReader.init(inputFileName, blockSize);
+    if (!fileReader.readFile(inputFileName))
+    {
+        std::cout << "Bad input file!" << std::endl;
+    }
+    else
+    {
+
+    }
     std::cout << "sd" << std::endl;
     return 0;
 }

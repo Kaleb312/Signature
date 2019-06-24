@@ -10,11 +10,12 @@ class FileReader
 {
 public:
     FileReader();
-    bool init(const std::string& fileName, int blockSize = 1);
+    FileReader(unsigned int blockSize);
+    bool readFile(const std::string& fileName);
 
 private:
     std::string mFileName;
-    int mBlockSize;
+    unsigned int mBlockSize;
 };
 
 #endif // FILEREADER_H
