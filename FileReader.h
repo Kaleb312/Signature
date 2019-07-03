@@ -22,8 +22,6 @@ public:
     Semaphore* getSemPtr();
 
 private:
-    void readFile();
-    static void test();
     std::ifstream mFin;
     std::string mFileName;
     unsigned int mBlockSize;

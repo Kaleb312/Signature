@@ -43,22 +43,20 @@ int main(int argc, char* argv[])
     else
     {
         fileReader.start();
-        fileReader.getSemPtr()->notify(11);
-        std::this_thread::sleep_for(std::chrono::seconds(100));
-
-//        std::this_thread::sleep_for(std::chrono::seconds(1));
-//        fileReader.getSemPtr()->notify(11);
-//        std::this_thread::sleep_for(std::chrono::seconds(1));
-//        fileReader.getSemPtr()->notify(11);
-//        std::this_thread::sleep_for(std::chrono::seconds(1));
-//        fileReader.getSemPtr()->notify(11);
+//        for (int i = 0; i < 100; ++i)
+//        {
+//            std::this_thread::sleep_for(std::chrono::seconds(1));
+//            fileReader.getSemPtr()->post();
+//        }
 //        fileReader.stop();
-//        fileReader.getSemPtr()->notify(11);
-//        std::this_thread::sleep_for(std::chrono::seconds(5));
-//        fileReader.getSemPtr()->notify(11);
-//        std::this_thread::sleep_for(std::chrono::seconds(5));
-//        fileReader.getSemPtr()->notify(11);
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        fileReader.getSemPtr()->post();
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        fileReader.getSemPtr()->post();
+
+
     }
-    std::cout << "sd" << std::endl;
+    std::cout << "\n-------FINISH----------\n" << std::endl;
     return 0;
 }

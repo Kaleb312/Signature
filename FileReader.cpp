@@ -1,20 +1,29 @@
 #include "FileReader.h"
 
-static const unsigned int THOUSAND_BYTES = 5;
+static constexpr auto THOUSAND_BYTES = 23;
+//static constexpr auto AVAILABLE_MEMORY = 3 * THOUSAND_BYTES * THOUSAND_BYTES * THOUSAND_BYTES;
+static constexpr auto AVAILABLE_MEMORY = 1 * THOUSAND_BYTES;
 
 FileReader::FileReader() :
-    mBlockSize(THOUSAND_BYTES)
+    mBlockSize(THOUSAND_BYTES),
+    mSem(AVAILABLE_MEMORY / THOUSAND_BYTES)
+{
+}
+
+FileReader::FileReader(unsigned int blockSize) :
+    mBlockSize(THOUSAND_BYTES * blockSize),
+    mSem(AVAILABLE_MEMORY / (THOUSAND_BYTES * blockSize))
 {
 }
 
 FileReader::~FileReader()
 {
-    mThread.join();
-}
-
-FileReader::FileReader(unsigned int blockSize) :
-    mBlockSize(THOUSAND_BYTES * blockSize)
-{
+    mStopFlag = true;
+    if (mThread.joinable())
+    {
+        mSem.post();
+        mThread.join();
+    }
 }
 
 bool FileReader::openFile(const std::string& fileName)
@@ -22,12 +31,7 @@ bool FileReader::openFile(const std::string& fileName)
     bool result = false;
     mFin.open(fileName, std::ios::in | std::ios::binary);
     mFin.unsetf(std::ios::skipws);
-    if (mFin.is_open())
-    {
-//        std::vector<char> readData(mBlockSize);
-//        mFin.getline(&readData.at(0), mBlockSize);
-        result = true;
-    }
+    result = mFin.is_open();
     return result;
 }
 
@@ -35,18 +39,21 @@ void FileReader::start()
 {
     auto read = [this]()
     {
-        mSem.wait(11);
         std::vector<char> readData(mBlockSize);
-        while (mFin && !mStopFlag)
+        while (mFin)
         {
-
+            if (mStopFlag)
+            {
+                break;
+            }
+            readData.assign(mBlockSize, 0);
             mFin.read(&readData.at(0), mBlockSize);
             for (std::vector<char>::const_iterator i = readData.begin(); i != readData.end(); ++i)
             {
-                std::cout << *i << ' ';
+                std::cout << *i;
             }
-            std::cout << std::endl;
-            mSem.notify(11);
+            std::cout << std::endl << "--------------" << std::endl;
+            mSem.wait();
         }
     };
     mThread = std::thread(read);
@@ -55,27 +62,11 @@ void FileReader::start()
 void FileReader::stop()
 {
     mStopFlag = true;
-    mSem.notify(11);
-    mThread.join();
-}
-
-void FileReader::readFile()
-{
-//    std::vector<char> readData(mBlockSize);
-//    while (mFin.read(&readData.at(0), mBlockSize))
-//    {
-//        mSem.wait(11);
-//        for (std::vector<char>::const_iterator i = readData.begin(); i != readData.end(); ++i)
-//        {
-//            std::cout << *i << ' ';
-//        }
-//        std::cout << std::endl;
-    //    }
-}
-
-void FileReader::test()
-{
-    std::cout << "werg" << std::endl;
+    if (mThread.joinable())
+    {
+        mSem.post();
+        mThread.join();
+    }
 }
 
 Semaphore* FileReader::getSemPtr()

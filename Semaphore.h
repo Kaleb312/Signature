@@ -9,8 +9,8 @@ class Semaphore
 {
 public:
     Semaphore (int count = 0);
-    void notify(int tid);
-    void wait(int tid);
+    void post();
+    void wait();
 
 private:
     std::mutex mMutex;
