@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "FileReader.h"
 
 int main(int argc, char* argv[])
@@ -35,13 +36,28 @@ int main(int argc, char* argv[])
 //    inputFileName = argv[1];
 //    outputFileName = argv[2];
     FileReader fileReader;
-    if (!fileReader.readFile(inputFileName))
+    if (!fileReader.openFile(inputFileName))
     {
         std::cout << "Bad input file!" << std::endl;
     }
     else
     {
+        fileReader.start();
+        fileReader.getSemPtr()->notify(11);
+        std::this_thread::sleep_for(std::chrono::seconds(100));
 
+//        std::this_thread::sleep_for(std::chrono::seconds(1));
+//        fileReader.getSemPtr()->notify(11);
+//        std::this_thread::sleep_for(std::chrono::seconds(1));
+//        fileReader.getSemPtr()->notify(11);
+//        std::this_thread::sleep_for(std::chrono::seconds(1));
+//        fileReader.getSemPtr()->notify(11);
+//        fileReader.stop();
+//        fileReader.getSemPtr()->notify(11);
+//        std::this_thread::sleep_for(std::chrono::seconds(5));
+//        fileReader.getSemPtr()->notify(11);
+//        std::this_thread::sleep_for(std::chrono::seconds(5));
+//        fileReader.getSemPtr()->notify(11);
     }
     std::cout << "sd" << std::endl;
     return 0;
