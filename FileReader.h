@@ -15,20 +15,23 @@
 class FileReader
 {
 public:
-    FileReader();
-    FileReader(unsigned int blockSize);
+    FileReader(const std::string& inFile, const std::string& outFile, unsigned int blockSize = 1);
     ~FileReader();
-    bool openFile(const std::string& fileName);
+    bool openFiles();
     void start();
     void stop();
-    void post();
+    void postInput();
+    void postOutput();
     std::vector<char> getDataBlock();
 
 private:
     std::ifstream mFin;
-    std::string mFileName;
+    std::ifstream mFout;
+    std::string mInputFileName;
+    std::string mOutputFileName;
     unsigned int mBlockSize;
-    Semaphore mSem;
+    Semaphore mInputSem;
+    Semaphore mOutputSem;
     std::thread mThread;
     std::atomic<bool> mStopFlag {false};
     std::queue<std::vector<char>> mDataQueue;

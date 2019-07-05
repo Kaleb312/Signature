@@ -1,19 +1,15 @@
 #include "FileReader.h"
 
-static constexpr auto THOUSAND_BYTES = 20;
-//static constexpr auto AVAILABLE_MEMORY = 3 * THOUSAND_BYTES * THOUSAND_BYTES * THOUSAND_BYTES;
-static constexpr auto AVAILABLE_MEMORY = 4 * THOUSAND_BYTES;
+static constexpr auto MEGABYTE_SIZE = 20 /*1024 * 1024*/;
+static constexpr auto AVAILABLE_MEMORY = 4 * MEGABYTE_SIZE;
 
-FileReader::FileReader() :
-    mBlockSize(THOUSAND_BYTES),
-    mSem(AVAILABLE_MEMORY / THOUSAND_BYTES)
+FileReader::FileReader(const std::string& inFile, const std::string& outFile, unsigned int blockSize) :
+    mInputFileName(inFile),
+    mOutputFileName(outFile),
+    mBlockSize(MEGABYTE_SIZE * blockSize),
+    mInputSem(AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize))
 {
-}
 
-FileReader::FileReader(unsigned int blockSize) :
-    mBlockSize(THOUSAND_BYTES * blockSize),
-    mSem(AVAILABLE_MEMORY / (THOUSAND_BYTES * blockSize))
-{
 }
 
 FileReader::~FileReader()
@@ -21,18 +17,17 @@ FileReader::~FileReader()
     mStopFlag = true;
     if (mThread.joinable())
     {
-        mSem.post();
+        mInputSem.post();
         mThread.join();
     }
 }
 
-bool FileReader::openFile(const std::string& fileName)
+bool FileReader::openFiles()
 {
-    bool result = false;
-    mFin.open(fileName, std::ios::in | std::ios::binary);
+    mFin.open(mInputFileName, std::ios::in | std::ios::binary);
     mFin.unsetf(std::ios::skipws);
-    result = mFin.is_open();
-    return result;
+    mFout.open(mOutputFileName, std::ios::out | std::ios::binary);
+    return mFin.is_open() && mFout.is_open();
 }
 
 void FileReader::start()
@@ -55,7 +50,7 @@ void FileReader::start()
             }
             std::cout << std::endl << "--------------" << std::endl;
             mDataQueue.push(readData);
-            mSem.wait();
+            mInputSem.wait();
         }
     };
     mThread = std::thread(read);
@@ -66,19 +61,29 @@ void FileReader::stop()
     mStopFlag = true;
     if (mThread.joinable())
     {
-        mSem.post();
+        mInputSem.post();
         mThread.join();
     }
 }
 
-void FileReader::post()
+void FileReader::postInput()
 {
-    mSem.post();
+    mInputSem.post();
+}
+
+void FileReader::postOutput()
+{
+    mOutputSem.post();
 }
 
 std::vector<char> FileReader::getDataBlock()
 {
-    mSem.post();
-    std::vector<char> returnValue = mDataQueue.front();
-    return std::move(returnValue);
+    mInputSem.post();
+    std::vector<char> returnValue;
+    if (!mDataQueue.empty())
+    {
+        returnValue = mDataQueue.front();
+        mDataQueue.pop();
+    }
+    return returnValue;
 }

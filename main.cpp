@@ -1,6 +1,6 @@
 #include <iostream>
 #include <chrono>
-#include "FileReader.h"
+#include "SignatureProcessor.h"
 
 int main(int argc, char* argv[])
 {
@@ -35,14 +35,14 @@ int main(int argc, char* argv[])
 //    }
 //    inputFileName = argv[1];
 //    outputFileName = argv[2];
-    FileReader fileReader;
-    if (!fileReader.openFile(inputFileName))
+    SignatureProcessor proc(inputFileName, outputFileName);
+
+    if (!proc.openFiles())
     {
-        std::cout << "Bad input file!" << std::endl;
+        std::cout << "Error: bad input of output file" << std::endl;
     }
     else
     {
-        fileReader.start();
 //        for (int i = 0; i < 100; ++i)
 //        {
 //            std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -50,16 +50,16 @@ int main(int argc, char* argv[])
 //        }
 //        fileReader.stop();
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        fileReader.post();
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        fileReader.post();
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        fileReader.post();
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        fileReader.post();
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        fileReader.post();
+//        std::this_thread::sleep_for(std::chrono::seconds(1));
+//        fileReader.post();
+//        std::this_thread::sleep_for(std::chrono::seconds(1));
+//        fileReader.post();
+//        std::this_thread::sleep_for(std::chrono::seconds(1));
+//        fileReader.post();
+//        std::this_thread::sleep_for(std::chrono::seconds(1));
+//        fileReader.post();
+//        std::this_thread::sleep_for(std::chrono::seconds(1));
+//        fileReader.post();
 
     }
     std::cout << "\n-------FINISH----------\n" << std::endl;

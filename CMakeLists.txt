@@ -11,6 +11,8 @@ set(SOURCES
     FileReader.cpp
     Semaphore.cpp
     Semaphore.h
+    SignatureProcessor.cpp
+    SignatureProcessor.h
     )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
