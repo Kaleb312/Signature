@@ -1,8 +1,8 @@
 #include "FileReader.h"
 
-static constexpr auto THOUSAND_BYTES = 23;
+static constexpr auto THOUSAND_BYTES = 20;
 //static constexpr auto AVAILABLE_MEMORY = 3 * THOUSAND_BYTES * THOUSAND_BYTES * THOUSAND_BYTES;
-static constexpr auto AVAILABLE_MEMORY = 1 * THOUSAND_BYTES;
+static constexpr auto AVAILABLE_MEMORY = 4 * THOUSAND_BYTES;
 
 FileReader::FileReader() :
     mBlockSize(THOUSAND_BYTES),
@@ -48,11 +48,13 @@ void FileReader::start()
             }
             readData.assign(mBlockSize, 0);
             mFin.read(&readData.at(0), mBlockSize);
+            std::cout << "Data read: ";
             for (std::vector<char>::const_iterator i = readData.begin(); i != readData.end(); ++i)
             {
                 std::cout << *i;
             }
             std::cout << std::endl << "--------------" << std::endl;
+            mDataQueue.push(readData);
             mSem.wait();
         }
     };
@@ -69,7 +71,14 @@ void FileReader::stop()
     }
 }
 
-Semaphore* FileReader::getSemPtr()
+void FileReader::post()
 {
-    return &mSem;
+    mSem.post();
+}
+
+std::vector<char> FileReader::getDataBlock()
+{
+    mSem.post();
+    std::vector<char> returnValue = mDataQueue.front();
+    return std::move(returnValue);
 }

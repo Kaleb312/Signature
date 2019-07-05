@@ -51,10 +51,15 @@ int main(int argc, char* argv[])
 //        fileReader.stop();
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        fileReader.getSemPtr()->post();
+        fileReader.post();
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        fileReader.getSemPtr()->post();
-
+        fileReader.post();
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        fileReader.post();
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        fileReader.post();
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        fileReader.post();
 
     }
     std::cout << "\n-------FINISH----------\n" << std::endl;

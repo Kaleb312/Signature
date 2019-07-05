@@ -8,6 +8,8 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
+#include <memory>
+#include <queue>
 #include "Semaphore.h"
 
 class FileReader
@@ -19,7 +21,8 @@ public:
     bool openFile(const std::string& fileName);
     void start();
     void stop();
-    Semaphore* getSemPtr();
+    void post();
+    std::vector<char> getDataBlock();
 
 private:
     std::ifstream mFin;
@@ -28,6 +31,6 @@ private:
     Semaphore mSem;
     std::thread mThread;
     std::atomic<bool> mStopFlag {false};
+    std::queue<std::vector<char>> mDataQueue;
 };
-
 #endif // FILEREADER_H
