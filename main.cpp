@@ -1,9 +1,35 @@
 #include <iostream>
 #include <chrono>
 #include "SignatureProcessor.h"
+#include "ctpl_stl.h"
+
+void first(int id) {
+    std::cout << "hello from " << id << ", function\n";
+}
+
+void aga(int id, int par) {
+    std::cout << "hello from " << id << ", function with parameter " << par <<'\n';
+}
+
+struct Third {
+    Third(int v) { this->v = v; std::cout << "Third ctor " << this->v << '\n'; }
+    Third(Third && c) { this->v = c.v; std::cout<<"Third move ctor\n"; }
+    Third(const Third & c) { this->v = c.v; std::cout<<"Third copy ctor\n"; }
+    ~Third() { std::cout << "Third dtor\n"; }
+    int v;
+};
 
 int main(int argc, char* argv[])
 {
+
+    ctpl::thread_pool p(2 /* two threads in the pool */);
+        std::future<void> qw = p.push(std::ref(first));  // function
+        p.push(first);  // function
+        p.push(aga, 7);  // function
+        p.push([](int id){  // lambda
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+//                std::cout << "hello from " << id << ' ' << s << '\n';
+            });
     auto blockSize {1};
     std::string inputFileName;
     std::string outputFileName;

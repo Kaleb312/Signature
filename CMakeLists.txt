@@ -13,6 +13,9 @@ set(SOURCES
     Semaphore.h
     SignatureProcessor.cpp
     SignatureProcessor.h
+    ThreadPool.cpp
+    ThreadPool.h
+    ctpl_stl.h
     )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
