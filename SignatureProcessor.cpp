@@ -10,3 +10,11 @@ bool SignatureProcessor::openFiles()
 {
     return mFileReader.openFiles();
 }
+
+void SignatureProcessor::calcSignature()
+{
+    mFileReader.start();
+    while (!mFileReader.isFinished())
+    {
+    }
+}

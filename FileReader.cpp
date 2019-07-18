@@ -4,11 +4,12 @@ static constexpr auto MEGABYTE_SIZE = 20 /*1024 * 1024*/;
 static constexpr auto AVAILABLE_MEMORY = 4 * MEGABYTE_SIZE;
 
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
-    mInputFileName(inFile),
+    mFileName(inFile),
     mBlockSize(MEGABYTE_SIZE * blockSize),
-    mInputSem(AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize))
+    mSem(AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize)),
+    mStopFlag(false),
+    mIsFinised(false)
 {
-
 }
 
 FileReader::~FileReader()
@@ -16,14 +17,14 @@ FileReader::~FileReader()
     mStopFlag = true;
     if (mThread.joinable())
     {
-        mInputSem.post();
+        mSem.post();
         mThread.join();
     }
 }
 
 bool FileReader::openFiles()
 {
-    mFin.open(mInputFileName, std::ios::in | std::ios::binary);
+    mFin.open(mFileName, std::ios::in | std::ios::binary);
     mFin.unsetf(std::ios::skipws);
     return mFin.is_open();
 }
@@ -48,10 +49,11 @@ void FileReader::start()
             }
             std::cout << std::endl << "--------------" << std::endl;
             mDataBlockList.push_back(readData);
-            mInputSem.wait();
+            mSem.wait();
         }
     };
     mThread = std::thread(read);
+    mIsFinised = true;
 }
 
 void FileReader::stop()
@@ -59,12 +61,17 @@ void FileReader::stop()
     mStopFlag = true;
     if (mThread.joinable())
     {
-        mInputSem.post();
+        mSem.post();
         mThread.join();
     }
 }
 
-void FileReader::postInput()
+void FileReader::post()
 {
-    mInputSem.post();
+    mSem.post();
+}
+
+bool FileReader::isFinished()
+{
+    return mIsFinised;
 }

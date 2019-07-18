@@ -2,7 +2,7 @@
 #define SIGNATUREPROCESSOR_H
 
 #include "FileReader.h"
-
+#include "ThreadPool.h"
 class SignatureProcessor
 {
 public:
@@ -12,6 +12,7 @@ public:
 
 private:
     FileReader mFileReader;
+    ThreadPool mThreadPool;
 };
 
 #endif // SIGNATUREPROCESSOR_H

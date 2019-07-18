@@ -20,17 +20,18 @@ public:
     bool openFiles();
     void start();
     void stop();
-    void postInput();
-    void postOutput();
+    void post();
+    bool isFinished();
     std::vector<char> getDataBlock();
 
 private:
     std::ifstream mFin;
-    std::string mInputFileName;
+    std::string mFileName;
     unsigned int mBlockSize;
-    Semaphore mInputSem;
+    Semaphore mSem;
     std::thread mThread;
-    std::atomic<bool> mStopFlag {false};
+    std::atomic<bool> mStopFlag;
+    bool mIsFinised;
     std::list<std::vector<char>> mDataBlockList;
 };
 #endif // FILEREADER_H

@@ -36,14 +36,17 @@ int main(int argc, char* argv[])
 //    }
 //    inputFileName = argv[1];
 //    outputFileName = argv[2];
-    SignatureProcessor proc(inputFileName, outputFileName);
 
+
+    SignatureProcessor proc(inputFileName, outputFileName);
     if (!proc.openFiles())
     {
         std::cout << "Error: bad input of output file" << std::endl;
     }
     else
     {
+        proc.calcSignature();
+
 //        for (int i = 0; i < 100; ++i)
 //        {
 //            std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -61,7 +64,6 @@ int main(int argc, char* argv[])
 //        fileReader.post();
 //        std::this_thread::sleep_for(std::chrono::seconds(1));
 //        fileReader.post();
-
     }
     std::cout << "\n-------FINISH----------\n" << std::endl;
     return 0;
