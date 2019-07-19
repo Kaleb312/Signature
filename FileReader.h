@@ -17,7 +17,7 @@ class FileReader
 public:
     FileReader(const std::string& inFile, unsigned int blockSize = 1);
     ~FileReader();
-    bool openFiles();
+    bool openFile();
     void start();
     void stop();
     void post();
@@ -30,6 +30,7 @@ private:
     unsigned int mBlockSize;
     Semaphore mSem;
     std::thread mThread;
+    std::mutex mMutex;
     std::atomic<bool> mStopFlag;
     bool mIsFinised;
     std::list<std::vector<char>> mDataBlockList;

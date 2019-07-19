@@ -22,7 +22,7 @@ FileReader::~FileReader()
     }
 }
 
-bool FileReader::openFiles()
+bool FileReader::openFile()
 {
     mFin.open(mFileName, std::ios::in | std::ios::binary);
     mFin.unsetf(std::ios::skipws);
@@ -42,13 +42,15 @@ void FileReader::start()
             }
             readData.assign(mBlockSize, 0);
             mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
-            std::cout << "Data read: ";
             for (std::vector<char>::const_iterator i = readData.begin(); i != readData.end(); ++i)
             {
                 std::cout << *i;
             }
             std::cout << std::endl << "--------------" << std::endl;
-            mDataBlockList.push_back(readData);
+            {
+                std::lock_guard<std::mutex> lock(mMutex);
+                mDataBlockList.push_back(readData);
+            }
             mSem.wait();
         }
     };
@@ -74,4 +76,13 @@ void FileReader::post()
 bool FileReader::isFinished()
 {
     return mIsFinised;
+}
+
+std::vector<char> FileReader::getDataBlock()
+{
+    std::lock_guard<std::mutex> lock(mMutex);
+    auto returnValue = mDataBlockList.front();
+    mDataBlockList.pop_front();
+    mSem.post();
+    return returnValue;
 }

@@ -7,8 +7,10 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 set(SOURCES
     main.cpp
-    FileReader.h
     FileReader.cpp
+    FileReader.h
+    FileWriter.cpp
+    FileWriter.h
     Semaphore.cpp
     Semaphore.h
     SignatureProcessor.cpp
