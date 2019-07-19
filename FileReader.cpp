@@ -81,8 +81,15 @@ bool FileReader::isFinished()
 std::vector<char> FileReader::getDataBlock()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    auto returnValue = mDataBlockList.front();
-    mDataBlockList.pop_front();
-    mSem.post();
-    return returnValue;
+    if (!mDataBlockList.empty())
+    {
+        auto returnValue = mDataBlockList.front();
+        mDataBlockList.pop_front();
+        mSem.post();
+        return returnValue;
+    }
+    else
+    {
+        return std::vector<char>();
+    }
 }

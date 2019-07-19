@@ -9,7 +9,7 @@ SignatureProcessor::SignatureProcessor(const std::string& inFile, const std::str
 
 bool SignatureProcessor::openFiles()
 {
-    return mFileReader.openFile();
+    return mFileReader.openFile() && mFileWriter.openFile();
 }
 
 void SignatureProcessor::calcSignature()
