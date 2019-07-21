@@ -9,11 +9,9 @@ class ThreadPool
 {
 public:
     ThreadPool();
-    std::future<size_t> processDataBlock(const std::vector<char>& input);
+    std::future<size_t> processDataBlock(std::string&& input);
 
 private:
-    size_t calcHash(const std::vector<char>& input) const;
-
     ctpl::thread_pool mPool;
 };
 
