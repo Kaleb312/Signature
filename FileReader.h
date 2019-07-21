@@ -4,7 +4,6 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <vector>
 #include <mutex>
 #include <thread>
 #include <atomic>
@@ -23,7 +22,7 @@ public:
     void post();
     bool isFinished();
     bool isDataReady();
-    std::vector<char> getDataBlock();
+    std::string getDataBlock();
 
 private:
     std::ifstream mFin;
@@ -34,6 +33,6 @@ private:
     std::mutex mMutex;
     std::atomic<bool> mStopFlag;
     bool mIsFinised;
-    std::list<std::vector<char>> mDataBlockList;
+    std::list<std::string> mDataBlockList;
 };
 #endif // FILEREADER_H
