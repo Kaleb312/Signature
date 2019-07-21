@@ -83,7 +83,7 @@ bool FileReader::isDataReady()
 std::string FileReader::getDataBlock()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    auto returnValue = mDataBlockList.front();
+    auto returnValue = std::move(mDataBlockList.front());
     mDataBlockList.pop_front();
     mSem.post();
     return returnValue;
