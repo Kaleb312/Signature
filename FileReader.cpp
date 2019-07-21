@@ -1,7 +1,7 @@
 #include "FileReader.h"
 
-static constexpr auto MEGABYTE_SIZE = 200 /*1024 * 1024*/;
-static constexpr auto AVAILABLE_MEMORY = 4 * MEGABYTE_SIZE;
+static constexpr auto MEGABYTE_SIZE = 1024 * 1024;
+static constexpr auto AVAILABLE_MEMORY = 1000 * MEGABYTE_SIZE;
 
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
     mFileName(inFile),
@@ -42,11 +42,6 @@ void FileReader::start()
             }
             readData.assign(mBlockSize, 0);
             mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
-//            for (std::vector<char>::const_iterator i = readData.begin(); i != readData.end(); ++i)
-//            {
-//                std::cout << *i;
-//            }
-//            std::cout << std::endl << "--------------" << std::endl;
             {
                 std::lock_guard<std::mutex> lock(mMutex);
                 mDataBlockList.push_back(readData);

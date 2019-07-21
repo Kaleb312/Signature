@@ -42,7 +42,7 @@ void FileWriter::start()
                     mFutureHashList.pop_front();
                 }
                 mFout << hash;
-                std::cout << "Result hash: " << hash << std::endl;
+                std::cout << hash << std::endl;
             }
             mSem.wait();
         }

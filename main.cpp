@@ -46,24 +46,6 @@ int main(int argc, char* argv[])
     else
     {
         proc.calcSignature();
-
-//        for (int i = 0; i < 100; ++i)
-//        {
-//            std::this_thread::sleep_for(std::chrono::seconds(1));
-//            fileReader.getSemPtr()->post();
-//        }
-//        fileReader.stop();
-
-//        std::this_thread::sleep_for(std::chrono::seconds(1));
-//        fileReader.post();
-//        std::this_thread::sleep_for(std::chrono::seconds(1));
-//        fileReader.post();
-//        std::this_thread::sleep_for(std::chrono::seconds(1));
-//        fileReader.post();
-//        std::this_thread::sleep_for(std::chrono::seconds(1));
-//        fileReader.post();
-//        std::this_thread::sleep_for(std::chrono::seconds(1));
-//        fileReader.post();
     }
     std::cout << "\n-------FINISH----------\n" << std::endl;
     return 0;
