@@ -1,6 +1,6 @@
 #include "FileReader.h"
 
-static constexpr auto MEGABYTE_SIZE = 20 /*1024 * 1024*/;
+static constexpr auto MEGABYTE_SIZE = 1024 * 1024;
 static constexpr auto AVAILABLE_MEMORY = 1000 * MEGABYTE_SIZE;
 
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
