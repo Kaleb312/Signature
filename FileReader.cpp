@@ -1,6 +1,6 @@
 #include "FileReader.h"
 
-static constexpr auto MEGABYTE_SIZE = 20 /*1024 * 1024*/;
+static constexpr auto MEGABYTE_SIZE = 200 /*1024 * 1024*/;
 static constexpr auto AVAILABLE_MEMORY = 4 * MEGABYTE_SIZE;
 
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
@@ -42,20 +42,20 @@ void FileReader::start()
             }
             readData.assign(mBlockSize, 0);
             mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
-            for (std::vector<char>::const_iterator i = readData.begin(); i != readData.end(); ++i)
-            {
-                std::cout << *i;
-            }
-            std::cout << std::endl << "--------------" << std::endl;
+//            for (std::vector<char>::const_iterator i = readData.begin(); i != readData.end(); ++i)
+//            {
+//                std::cout << *i;
+//            }
+//            std::cout << std::endl << "--------------" << std::endl;
             {
                 std::lock_guard<std::mutex> lock(mMutex);
                 mDataBlockList.push_back(readData);
             }
             mSem.wait();
         }
+        mIsFinised = true;
     };
     mThread = std::thread(read);
-    mIsFinised = true;
 }
 
 void FileReader::stop()
@@ -75,7 +75,14 @@ void FileReader::post()
 
 bool FileReader::isFinished()
 {
-    return mIsFinised;
+    std::lock_guard<std::mutex> lock(mMutex);
+    return mIsFinised && mDataBlockList.empty();
+}
+
+bool FileReader::isDataReady()
+{
+    std::lock_guard<std::mutex> lock(mMutex);
+    return !mDataBlockList.empty();
 }
 
 std::vector<char> FileReader::getDataBlock()

@@ -4,7 +4,6 @@ SignatureProcessor::SignatureProcessor(const std::string& inFile, const std::str
     mFileReader(inFile, blockSize),
     mFileWriter(outFile)
 {
-
 }
 
 bool SignatureProcessor::openFiles()
@@ -18,7 +17,12 @@ void SignatureProcessor::calcSignature()
     mFileWriter.start();
     while (!mFileReader.isFinished())
     {
-        mFileWriter.pushFutureInList(mThreadPool.processDataBlock(mFileReader.getDataBlock()));
-        mFileWriter.post();
+        if (mFileReader.isDataReady())
+        {
+            mFileWriter.pushFutureInList(mThreadPool.processDataBlock(mFileReader.getDataBlock()));
+            mFileWriter.post();
+        }
     }
+    mFileReader.stop();
+    mFileWriter.stop();
 }

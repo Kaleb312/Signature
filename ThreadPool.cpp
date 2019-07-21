@@ -1,22 +1,13 @@
 #include "ThreadPool.h"
 
-const auto BUSY_THREADS = 3;
-
 ThreadPool::ThreadPool() :
-    mPool(static_cast<int>(std::thread::hardware_concurrency() - BUSY_THREADS))
+    mPool(static_cast<int>(std::thread::hardware_concurrency()))
 {
-
 }
 
 size_t ThreadPool::calcHash(const std::vector<char>& input) const
 {
-    size_t result = 0;
-    for (auto& byte : input)
-    {
-        size_t byteHash = std::hash<char>()(byte);
-        result = result ^ (byteHash << 1);
-    }
-    return result;
+    return std::hash<std::string>()(std::string(input.begin(), input.end()));
 }
 
 std::future<size_t> ThreadPool::processDataBlock(const std::vector<char>& input)

@@ -35,9 +35,13 @@ void FileWriter::start()
             }
             if (!mFutureHashList.empty())
             {
-                std::lock_guard<std::mutex> lock(mMutex);
-                size_t hash = mFutureHashList.front().get();
-                mFutureHashList.pop_front();
+                size_t hash = 0;
+                {
+                    std::lock_guard<std::mutex> lock(mMutex);
+                    hash = mFutureHashList.front().get();
+                    mFutureHashList.pop_front();
+                }
+                mFout << hash;
                 std::cout << "Result hash: " << hash << std::endl;
             }
             mSem.wait();

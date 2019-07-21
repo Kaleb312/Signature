@@ -22,6 +22,7 @@ public:
     void stop();
     void post();
     bool isFinished();
+    bool isDataReady();
     std::vector<char> getDataBlock();
 
 private:
