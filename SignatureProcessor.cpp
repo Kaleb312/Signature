@@ -2,7 +2,8 @@
 
 SignatureProcessor::SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize) :
     mFileReader(inFile, blockSize),
-    mFileWriter(outFile)
+    mFileWriter(outFile),
+    mThreadPool(std::thread::hardware_concurrency())
 {
 }
 
