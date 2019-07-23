@@ -8,7 +8,7 @@
 #include <atomic>
 #include <memory>
 #include <list>
-#include "ctpl_stl.h"
+#include <future>
 #include "Semaphore.h"
 
 class FileWriter
@@ -20,7 +20,9 @@ public:
     void start();
     void stop();
     void post();
+    void finish();
     void pushFutureInList(std::future<size_t>&& future);
+    bool isFinished();
 
 private:
     std::ofstream mFout;

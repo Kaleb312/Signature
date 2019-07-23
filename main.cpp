@@ -1,7 +1,6 @@
 #include <iostream>
 #include <chrono>
 #include "SignatureProcessor.h"
-#include "ctpl_stl.h"
 
 int main(int argc, char* argv[])
 {
