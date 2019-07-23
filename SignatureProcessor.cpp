@@ -16,7 +16,7 @@ void SignatureProcessor::calcSignature()
 {
     mFileReader.start();
     mFileWriter.start();
-    while (!mFileReader.isFinished())
+    while (!mFileReader.isFinished() || !mFileWriter.isFinished())
     {
         if (mFileReader.isDataReady())
         {
@@ -24,6 +24,6 @@ void SignatureProcessor::calcSignature()
             mFileWriter.post();
         }
     }
-    mFileReader.stop();
-    mFileWriter.stop();
+    mFileReader.finish();
+    mFileWriter.finish();
 }

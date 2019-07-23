@@ -20,6 +20,7 @@ public:
     void start();
     void stop();
     void post();
+    void finish();
     bool isFinished();
     bool isDataReady();
     std::string getDataBlock();

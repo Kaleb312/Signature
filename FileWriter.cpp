@@ -65,8 +65,27 @@ void FileWriter::post()
     mSem.post();
 }
 
+void FileWriter::finish()
+{
+    {
+        std::lock_guard<std::mutex> lock(mMutex);
+        if (mFutureHashList.empty())
+        {
+            mStopFlag = true;
+        }
+    }
+    mSem.post();
+    mThread.join();
+}
+
 void FileWriter::pushFutureInList(std::future<size_t>&& future)
 {
     std::lock_guard<std::mutex> lock(mMutex);
     mFutureHashList.push_back(std::move(future));
+}
+
+bool FileWriter::isFinished()
+{
+    std::lock_guard<std::mutex> lock(mMutex);
+    return mFutureHashList.empty();
 }

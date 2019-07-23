@@ -9,7 +9,7 @@ ThreadPool::ThreadPool(size_t threadsNumber) :
         (
             [this]
             {
-               for(;;)
+               while(true)
                {
                    std::function<void()> task;
                    {
@@ -44,7 +44,10 @@ ThreadPool::~ThreadPool()
 
 std::future<size_t> ThreadPool::processDataBlock(std::string&& input)
 {
-    auto task = std::make_shared<std::packaged_task<size_t()>>([input]{return std::hash<std::string>()(input);});
+    auto task = std::make_shared<std::packaged_task<size_t()>>([input]
+    {
+        return std::hash<std::string>()(input);
+    });
     auto result = task->get_future();
     {
         std::unique_lock<std::mutex> lock(mMutex);
@@ -56,32 +59,4 @@ std::future<size_t> ThreadPool::processDataBlock(std::string&& input)
     }
     mCv.notify_one();
     return result;
-//    return addTask([input](){std::hash<std::string>()(input);});
-//    return mPool.push
-//    (
-//        [input](int)
-//        {
-//            return std::hash<std::string>()(input);
-//        }
-//    );
 }
-
-//template<class F, class... Args>
-//auto ThreadPool::addTask(F&& func, Args&&... args)
-//    -> std::future<typename std::result_of<F(Args...)>::type>
-//{
-//    using returnType = typename std::result_of<F(Args...)>::type;
-//    auto task = std::make_shared<std::packaged_task<returnType()>>(std::bind(std::forward<F>(func),
-//        std::forward<Args>(args)...));
-//    std::future<returnType> result = task->get_future();
-//    {
-//        std::unique_lock<std::mutex> lock(mMutex);
-//        if (mStopFlag)
-//        {
-//            throw std::runtime_error("Adding task in stopped thread pool");
-//        }
-//        mTasks.emplace([task](){(*task)();});
-//    }
-//    mCv.notify_one();
-//    return result;
-//}

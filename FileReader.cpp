@@ -1,7 +1,7 @@
 #include "FileReader.h"
 
-static constexpr auto MEGABYTE_SIZE = 1024 * 1024;
-static constexpr auto AVAILABLE_MEMORY = 1000 * MEGABYTE_SIZE;
+static constexpr auto MEGABYTE_SIZE = 20 /*1024 * 1024*/;
+static constexpr auto AVAILABLE_MEMORY = 100 /*0 * MEGABYTE_SIZE*/;
 
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
     mFileName(inFile),
@@ -66,6 +66,12 @@ void FileReader::stop()
 void FileReader::post()
 {
     mSem.post();
+}
+
+void FileReader::finish()
+{
+    mSem.post();
+    mThread.join();
 }
 
 bool FileReader::isFinished()
