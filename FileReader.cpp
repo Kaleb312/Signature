@@ -1,7 +1,7 @@
 #include "FileReader.h"
 
 static constexpr auto MEGABYTE_SIZE = 20 /*1024 * 1024*/;
-static constexpr auto AVAILABLE_MEMORY = 100 /*0 * MEGABYTE_SIZE*/;
+static constexpr auto AVAILABLE_MEMORY = 100/*24 * MEGABYTE_SIZE*/;
 
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
     mFileName(inFile),
@@ -33,20 +33,28 @@ void FileReader::start()
 {
     auto read = [this]()
     {
-        while (mFin)
+        try
         {
-            if (mStopFlag)
+            while (mFin)
             {
-                break;
+                if (mStopFlag)
+                {
+                    break;
+                }
+                std::string readData;
+                readData.assign(mBlockSize, 0);
+                mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
+                {
+                    std::lock_guard<std::mutex> lock(mMutex);
+                    mDataBlockList.push_back(std::move(readData));
+                }
+                mSem.wait();
             }
-            std::string readData;
-            readData.assign(mBlockSize, 0);
-            mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
-            {
-                std::lock_guard<std::mutex> lock(mMutex);
-                mDataBlockList.push_back(std::move(readData));
-            }
-            mSem.wait();
+        }
+        catch (const std::exception& e)
+        {
+            mStopFlag = true;
+            std::cout << "\nFileReader read() function exception caught: " << e.what() <<std::endl;
         }
         mIsFinised = true;
     };
@@ -88,9 +96,19 @@ bool FileReader::isDataReady()
 
 std::string FileReader::getDataBlock()
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    auto returnValue = std::move(mDataBlockList.front());
-    mDataBlockList.pop_front();
-    mSem.post();
+    std::string returnValue;
+    try
+    {
+        std::lock_guard<std::mutex> lock(mMutex);
+        returnValue = std::move(mDataBlockList.front());
+        mDataBlockList.pop_front();
+        mSem.post();
+    }
+    catch (const std::exception& e)
+    {
+        mStopFlag = true;
+        mIsFinised = true;
+        std::cout << "\nFileReader getDataBlock() function exception caught: " << e.what() <<std::endl;
+    }
     return returnValue;
 }

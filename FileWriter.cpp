@@ -27,24 +27,32 @@ void FileWriter::start()
 {
     auto write = [this]()
     {
-        while (true)
+        try
         {
-            if (mStopFlag)
+            while (true)
             {
-                break;
-            }
-            if (!mFutureHashList.empty())
-            {
-                size_t hash = 0;
+                if (mStopFlag)
                 {
-                    std::lock_guard<std::mutex> lock(mMutex);
-                    hash = mFutureHashList.front().get();
-                    mFutureHashList.pop_front();
+                    break;
                 }
-                mFout << hash;
-                std::cout << hash << std::endl;
+                if (!mFutureHashList.empty())
+                {
+                    size_t hash = 0;
+                    {
+                        std::lock_guard<std::mutex> lock(mMutex);
+                        hash = mFutureHashList.front().get();
+                        mFutureHashList.pop_front();
+                    }
+                    mFout << hash;
+                    std::cout << hash << std::endl;
+                }
+                mSem.wait();
             }
-            mSem.wait();
+        }
+        catch (const std::exception& e)
+        {
+            mStopFlag = true;
+            std::cout << "\nFileWriter write() function exception caught: " << e.what() <<std::endl;
         }
     };
     mThread = std::thread(write);

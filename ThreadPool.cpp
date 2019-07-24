@@ -3,29 +3,45 @@
 ThreadPool::ThreadPool(size_t threadsNumber) :
     mStopFlag(false)
 {
+    auto threadTask = [this]
+    {
+        while(true)
+        {
+            try
+            {
+                std::function<void()> task;
+                {
+                    std::unique_lock<std::mutex> lock(mMutex);
+                    mCv.wait(lock, [this]{return mStopFlag || !mTasks.empty();});
+                    if (mStopFlag && mTasks.empty())
+                    {
+                        return;
+                    }
+                    task = std::move(mTasks.front());
+                    mTasks.pop();
+                }
+                task();
+            }
+            catch (const std::exception& e)
+            {
+                mStopFlag = true;
+                mCv.notify_all();
+                std::cout << "\nThreadPool threadTask() function exception caught: " << e.what() << std::endl;
+            }
+        }
+    };
     for (size_t i = 0; i < threadsNumber; ++i)
     {
-        mThreads.emplace_back
-        (
-            [this]
-            {
-               while(true)
-               {
-                   std::function<void()> task;
-                   {
-                       std::unique_lock<std::mutex> lock(mMutex);
-                       mCv.wait(lock, [this]{return mStopFlag || !mTasks.empty();});
-                       if (mStopFlag && mTasks.empty())
-                       {
-                           return;
-                       }
-                       task = std::move(mTasks.front());
-                       mTasks.pop();
-                   }
-                   task();
-               }
-            }
-        );
+        try
+        {
+            mThreads.emplace_back(threadTask);
+        }
+        catch (const std::exception& e)
+        {
+            mStopFlag = true;
+            mCv.notify_all();
+            std::cout << "\nThreadPool mThreads.emplace_back() function exception caught: " << e.what() << std::endl;
+        }
     }
 }
 
