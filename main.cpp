@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
     auto blockSize {1};
     std::string inputFileName;
     std::string outputFileName;
-    inputFileName = "in.txt";
+    inputFileName = "in2.txt";
     outputFileName = "out.txt";
     const auto defaultArgumentNumber {3};
     const auto argumentNumberWithBlockSize {4};

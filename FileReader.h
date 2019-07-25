@@ -8,7 +8,7 @@
 #include <thread>
 #include <atomic>
 #include <memory>
-#include <list>
+#include <queue>
 #include "Semaphore.h"
 
 class FileReader
@@ -34,6 +34,6 @@ private:
     std::mutex mMutex;
     std::atomic<bool> mStopFlag;
     bool mIsFinised;
-    std::list<std::string> mDataBlockList;
+    std::queue<std::string> mDataBlockList;
 };
 #endif // FILEREADER_H

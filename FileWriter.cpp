@@ -41,7 +41,7 @@ void FileWriter::start()
                     {
                         std::lock_guard<std::mutex> lock(mMutex);
                         hash = mFutureHashList.front().get();
-                        mFutureHashList.pop_front();
+                        mFutureHashList.pop();
                     }
                     mFout << hash;
                     std::cout << hash << std::endl;
@@ -89,7 +89,7 @@ void FileWriter::finish()
 void FileWriter::pushFutureInList(std::future<size_t>&& future)
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    mFutureHashList.push_back(std::move(future));
+    mFutureHashList.push(std::move(future));
 }
 
 bool FileWriter::isFinished()

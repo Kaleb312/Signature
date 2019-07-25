@@ -16,7 +16,6 @@ private:
     FileReader mFileReader;
     FileWriter mFileWriter;
     ThreadPool mThreadPool;
-    std::list<std::future<size_t>> mFutureHashList;
 };
 
 #endif // SIGNATUREPROCESSOR_H

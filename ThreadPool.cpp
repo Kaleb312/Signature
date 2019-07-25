@@ -60,18 +60,18 @@ ThreadPool::~ThreadPool()
 
 std::future<size_t> ThreadPool::processDataBlock(std::string&& input)
 {
-    auto task = std::make_shared<std::packaged_task<size_t()>>([input]
+    auto calcHash = std::make_shared<std::packaged_task<size_t()>>([input]
     {
         return std::hash<std::string>()(input);
     });
-    auto result = task->get_future();
+    auto result = calcHash->get_future();
     {
         std::unique_lock<std::mutex> lock(mMutex);
         if (mStopFlag)
         {
             throw std::runtime_error("Adding task in stopped thread pool");
         }
-        mTasks.emplace([task](){(*task)();});
+        mTasks.emplace([calcHash](){(*calcHash)();});
     }
     mCv.notify_one();
     return result;

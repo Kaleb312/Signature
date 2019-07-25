@@ -16,14 +16,23 @@ void SignatureProcessor::calcSignature()
 {
     mFileReader.start();
     mFileWriter.start();
-    while (!mFileReader.isFinished() || !mFileWriter.isFinished())
+    try
     {
-        if (mFileReader.isDataReady())
+        while (!mFileReader.isFinished() || !mFileWriter.isFinished())
         {
-            mFileWriter.pushFutureInList(mThreadPool.processDataBlock(mFileReader.getDataBlock()));
-            mFileWriter.post();
+            if (mFileReader.isDataReady())
+            {
+                mFileWriter.pushFutureInList(mThreadPool.processDataBlock(mFileReader.getDataBlock()));
+                mFileWriter.post();
+            }
         }
+        mFileReader.finish();
+        mFileWriter.finish();
     }
-    mFileReader.finish();
-    mFileWriter.finish();
+    catch (const std::exception& e)
+    {
+        mFileReader.stop();
+        mFileWriter.stop();
+        std::cout << "\nSignatureProcessor calcSignature() function exception caught: " << e.what() <<std::endl;
+    }
 }

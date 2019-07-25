@@ -7,7 +7,7 @@
 #include <thread>
 #include <atomic>
 #include <memory>
-#include <list>
+#include <queue>
 #include <future>
 #include "Semaphore.h"
 
@@ -31,7 +31,7 @@ private:
     std::thread mThread;
     std::mutex mMutex;
     std::atomic<bool> mStopFlag;
-    std::list<std::future<size_t>> mFutureHashList;
+    std::queue<std::future<size_t>> mFutureHashList;
 };
 
 #endif // FILEWRITER_H

@@ -46,7 +46,7 @@ void FileReader::start()
                 mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
                 {
                     std::lock_guard<std::mutex> lock(mMutex);
-                    mDataBlockList.push_back(std::move(readData));
+                    mDataBlockList.push(std::move(readData));
                 }
                 mSem.wait();
             }
@@ -101,7 +101,7 @@ std::string FileReader::getDataBlock()
     {
         std::lock_guard<std::mutex> lock(mMutex);
         returnValue = std::move(mDataBlockList.front());
-        mDataBlockList.pop_front();
+        mDataBlockList.pop();
         mSem.post();
     }
     catch (const std::exception& e)
