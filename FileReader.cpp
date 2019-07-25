@@ -20,6 +20,10 @@ FileReader::~FileReader()
         mSem.post();
         mThread.join();
     }
+    if (mFin.is_open())
+    {
+        mFin.close();
+    }
 }
 
 bool FileReader::openFile()

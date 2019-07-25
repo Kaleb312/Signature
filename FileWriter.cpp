@@ -15,6 +15,10 @@ FileWriter::~FileWriter()
         mSem.post();
         mThread.join();
     }
+    if (mFout.is_open())
+    {
+        mFout.close();
+    }
 }
 
 bool FileWriter::openFile()
