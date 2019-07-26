@@ -48,7 +48,6 @@ void FileWriter::start()
                         mFutureHashList.pop();
                     }
                     mFout << hash;
-                    std::cout << hash << std::endl;
                 }
                 mSem.wait();
             }
@@ -57,6 +56,7 @@ void FileWriter::start()
         {
             mStopFlag = true;
             std::cout << "\nFileWriter write() function exception caught: " << e.what() <<std::endl;
+            std::exit(EXIT_FAILURE);
         }
     };
     mThread = std::thread(write);

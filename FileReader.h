@@ -11,6 +11,9 @@
 #include <queue>
 #include "Semaphore.h"
 
+static constexpr auto MEGABYTE_SIZE = 1024 * 1024;
+static constexpr auto AVAILABLE_MEMORY = 1024 * MEGABYTE_SIZE;
+
 class FileReader
 {
 public:

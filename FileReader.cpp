@@ -1,8 +1,5 @@
 #include "FileReader.h"
 
-static constexpr auto MEGABYTE_SIZE = 20 /*1024 * 1024*/;
-static constexpr auto AVAILABLE_MEMORY = 100/*24 * MEGABYTE_SIZE*/;
-
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
     mFileName(inFile),
     mBlockSize(MEGABYTE_SIZE * blockSize),
@@ -59,6 +56,7 @@ void FileReader::start()
         {
             mStopFlag = true;
             std::cout << "\nFileReader read() function exception caught: " << e.what() <<std::endl;
+            std::exit(EXIT_FAILURE);
         }
         mIsFinised = true;
     };
@@ -113,6 +111,7 @@ std::string FileReader::getDataBlock()
         mStopFlag = true;
         mIsFinised = true;
         std::cout << "\nFileReader getDataBlock() function exception caught: " << e.what() <<std::endl;
+        std::exit(EXIT_FAILURE);
     }
     return returnValue;
 }

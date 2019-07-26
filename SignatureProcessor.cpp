@@ -3,7 +3,7 @@
 SignatureProcessor::SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize) :
     mFileReader(inFile, blockSize),
     mFileWriter(outFile),
-    mThreadPool(std::thread::hardware_concurrency())
+    mThreadPool(std::thread::hardware_concurrency() - 1) // one thread is for work with files
 {
 }
 
@@ -34,5 +34,6 @@ void SignatureProcessor::calcSignature()
         mFileReader.stop();
         mFileWriter.stop();
         std::cout << "\nSignatureProcessor calcSignature() function exception caught: " << e.what() <<std::endl;
+        std::exit(EXIT_FAILURE);
     }
 }
