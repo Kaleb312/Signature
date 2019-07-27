@@ -63,16 +63,16 @@ ThreadPool::~ThreadPool()
 std::future<size_t> ThreadPool::processDataBlock(std::string&& inputData)
 {
     std::cout << "ThreadPool: processDataBlock() start" << std::endl;
-    auto calcHash = std::make_shared<std::packaged_task<size_t(std::string&&)>>([](std::string&& input)
+//    auto calcHash = std::make_shared<std::packaged_task<size_t(std::string&&)>>([](std::string&& input)
+//    {
+//        std::cout << "ThreadPool: processDataBlock():calcHash start" <<std::endl;
+//        return std::hash<std::string>()(input);
+//    });
+    auto calcHash = std::make_shared<std::packaged_task<size_t()>>([input = std::move(inputData)]()
     {
         std::cout << "ThreadPool: processDataBlock():calcHash start" <<std::endl;
         return std::hash<std::string>()(input);
     });
-//    auto calcHash = std::make_shared<std::packaged_task<size_t()>>([&inputData]()
-//    {
-//        std::cout << "ThreadPool: processDataBlock():calcHash start" <<std::endl;
-//        return std::hash<std::string>()(inputData);
-//    });
     auto result = calcHash->get_future();
     {
         std::cout << "ThreadPool: processDataBlock() fuck" <<std::endl;
@@ -83,8 +83,8 @@ std::future<size_t> ThreadPool::processDataBlock(std::string&& inputData)
             throw std::runtime_error("Adding task in stopped thread pool");
         }
         std::cout << "ThreadPool: processDataBlock():mTasks.emplace" <<std::endl;
-        mTasks.emplace([calcHash, &inputData](){(*calcHash)(std::move(inputData));});
-//        mTasks.emplace([calcHash](){(*calcHash)();});
+//        mTasks.emplace([calcHash, &inputData](){(*calcHash)(std::move(inputData));});
+        mTasks.emplace([calcHash](){(*calcHash)();});
     }
     mCv.notify_one();
     return result;
