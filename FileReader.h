@@ -26,7 +26,7 @@ public:
     void finish();
     bool isFinished();
     bool isDataReady();
-    std::string getDataBlock();
+    bool getDataBlock(std::string& dataBlock);
 
 private:
     std::ifstream mFin;
@@ -37,6 +37,6 @@ private:
     std::mutex mMutex;
     std::atomic<bool> mStopFlag;
     bool mIsFinised;
-    std::queue<std::string> mDataBlockList;
+    std::queue<std::string> mDataBlockQueue;
 };
 #endif // FILEREADER_H

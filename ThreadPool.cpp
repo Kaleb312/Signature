@@ -13,7 +13,7 @@ ThreadPool::ThreadPool(size_t threadsNumber) :
                 {
                     std::unique_lock<std::mutex> lock(mMutex);
                     mCv.wait(lock, [this]{return mStopFlag || !mTasks.empty();});
-                    if (mStopFlag && mTasks.empty())
+                    if (mStopFlag || mTasks.empty())
                     {
                         return;
                     }
@@ -60,20 +60,31 @@ ThreadPool::~ThreadPool()
     }
 }
 
-std::future<size_t> ThreadPool::processDataBlock(std::string&& input)
+std::future<size_t> ThreadPool::processDataBlock(std::string&& inputData)
 {
-    auto calcHash = std::make_shared<std::packaged_task<size_t()>>([input]
+    std::cout << "ThreadPool: processDataBlock() start" << std::endl;
+    auto calcHash = std::make_shared<std::packaged_task<size_t(std::string&&)>>([](std::string&& input)
     {
+        std::cout << "ThreadPool: processDataBlock():calcHash start" <<std::endl;
         return std::hash<std::string>()(input);
     });
+//    auto calcHash = std::make_shared<std::packaged_task<size_t()>>([&inputData]()
+//    {
+//        std::cout << "ThreadPool: processDataBlock():calcHash start" <<std::endl;
+//        return std::hash<std::string>()(inputData);
+//    });
     auto result = calcHash->get_future();
     {
+        std::cout << "ThreadPool: processDataBlock() fuck" <<std::endl;
         std::unique_lock<std::mutex> lock(mMutex);
+        std::cout << "ThreadPool: processDataBlock():calcHash->get_future" <<std::endl;
         if (mStopFlag)
         {
             throw std::runtime_error("Adding task in stopped thread pool");
         }
-        mTasks.emplace([calcHash](){(*calcHash)();});
+        std::cout << "ThreadPool: processDataBlock():mTasks.emplace" <<std::endl;
+        mTasks.emplace([calcHash, &inputData](){(*calcHash)(std::move(inputData));});
+//        mTasks.emplace([calcHash](){(*calcHash)();});
     }
     mCv.notify_one();
     return result;

@@ -3,7 +3,7 @@
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
     mFileName(inFile),
     mBlockSize(MEGABYTE_SIZE * blockSize),
-    mSem(AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize)),
+    mSem((AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize))),
     mStopFlag(false),
     mIsFinised(false)
 {
@@ -42,14 +42,20 @@ void FileReader::start()
                 {
                     break;
                 }
+                std::cout << "FileReader: mSem.count = " << mSem.getCount() <<std::endl;
+                mSem.wait();
                 std::string readData;
                 readData.assign(mBlockSize, 0);
+                std::cout << "FileReader: new empty data block created" <<std::endl;
                 mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
+                std::cout << "FileReader: data read success" <<std::endl;
                 {
                     std::lock_guard<std::mutex> lock(mMutex);
-                    mDataBlockList.push(std::move(readData));
+                    mDataBlockQueue.push(std::move(readData));
+                    std::cout << "FileReader: data pushed to queue" <<std::endl;
                 }
-                mSem.wait();
+
+
             }
         }
         catch (const std::exception& e)
@@ -87,24 +93,49 @@ void FileReader::finish()
 bool FileReader::isFinished()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return mIsFinised && mDataBlockList.empty();
+    return mIsFinised && mDataBlockQueue.empty();
 }
 
 bool FileReader::isDataReady()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return !mDataBlockList.empty();
+    return !mDataBlockQueue.empty();
 }
 
-std::string FileReader::getDataBlock()
+//std::string FileReader::getDataBlock()
+//{
+//    std::string returnValue;
+//    try
+//    {
+//        std::lock_guard<std::mutex> lock(mMutex);
+//        if (!mDataBlockQueue.empty())
+//        {
+//            returnValue = std::move(mDataBlockQueue.front());
+//            mDataBlockQueue.pop();
+//        }
+//    }
+//    catch (const std::exception& e)
+//    {
+//        mStopFlag = true;
+//        mIsFinised = true;
+//        std::cout << "\nFileReader getDataBlock() function exception caught: " << e.what() <<std::endl;
+//        std::exit(EXIT_FAILURE);
+//    }
+//    return returnValue;
+//}
+
+bool FileReader::getDataBlock(std::string& dataBlock)
 {
-    std::string returnValue;
+    bool returnValue = false;
     try
     {
         std::lock_guard<std::mutex> lock(mMutex);
-        returnValue = std::move(mDataBlockList.front());
-        mDataBlockList.pop();
-        mSem.post();
+        if (!mDataBlockQueue.empty())
+        {
+            dataBlock = std::move(mDataBlockQueue.front());
+            mDataBlockQueue.pop();
+            returnValue = true;
+        }
     }
     catch (const std::exception& e)
     {
@@ -115,3 +146,4 @@ std::string FileReader::getDataBlock()
     }
     return returnValue;
 }
+

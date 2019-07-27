@@ -21,3 +21,9 @@ void Semaphore::wait()
     }
     mCount--;
 }
+
+int Semaphore::getCount()
+{
+    std::unique_lock<std::mutex> lock(mMutex);
+    return mCount;
+}

@@ -1,9 +1,10 @@
 #include "FileWriter.h"
 
-FileWriter::FileWriter(const std::string& outFile) :
+FileWriter::FileWriter(const std::string& outFile, FileReader *fileReaderPtr) :
     mFileName(outFile),
     mSem(0),
-    mStopFlag(false)
+    mStopFlag(false),
+    mFileReaderPtr(fileReaderPtr)
 {
 }
 
@@ -39,15 +40,17 @@ void FileWriter::start()
                 {
                     break;
                 }
-                if (!mFutureHashList.empty())
+                if (!mFutureHashQueue.empty())
                 {
                     size_t hash = 0;
                     {
                         std::lock_guard<std::mutex> lock(mMutex);
-                        hash = mFutureHashList.front().get();
-                        mFutureHashList.pop();
+                        hash = mFutureHashQueue.front().get();
+                        mFutureHashQueue.pop();
                     }
                     mFout << hash;
+                    mFileReaderPtr->post();
+                    std::cout << hash << std::endl;
                 }
                 mSem.wait();
             }
@@ -81,7 +84,7 @@ void FileWriter::finish()
 {
     {
         std::lock_guard<std::mutex> lock(mMutex);
-        if (mFutureHashList.empty())
+        if (mFutureHashQueue.empty())
         {
             mStopFlag = true;
         }
@@ -90,14 +93,14 @@ void FileWriter::finish()
     mThread.join();
 }
 
-void FileWriter::pushFutureInList(std::future<size_t>&& future)
+void FileWriter::pushFutureInQueue(std::future<size_t>&& future)
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    mFutureHashList.push(std::move(future));
+    mFutureHashQueue.push(std::move(future));
 }
 
 bool FileWriter::isFinished()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return mFutureHashList.empty();
+    return mFutureHashQueue.empty();
 }
