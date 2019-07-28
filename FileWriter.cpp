@@ -1,6 +1,6 @@
 #include "FileWriter.h"
 
-FileWriter::FileWriter(const std::string& outFile, FileReader *fileReaderPtr) :
+FileWriter::FileWriter(const std::string& outFile, FileReader& fileReaderPtr) :
     mFileName(outFile),
     mSem(0),
     mStopFlag(false),
@@ -49,7 +49,7 @@ void FileWriter::start()
                         mFutureHashQueue.pop();
                     }
                     mFout << hash;
-                    mFileReaderPtr->post();
+                    mFileReaderPtr.post();
                     std::cout << hash << std::endl;
                 }
                 mSem.wait();

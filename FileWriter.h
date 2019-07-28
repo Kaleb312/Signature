@@ -15,7 +15,7 @@
 class FileWriter
 {
 public:
-    FileWriter(const std::string& outFile, FileReader* fileReaderPtr);
+    FileWriter(const std::string& outFile, FileReader& fileReaderPtr);
     ~FileWriter();
     bool openFile();
     void start();
@@ -33,7 +33,7 @@ private:
     std::mutex mMutex;
     std::atomic<bool> mStopFlag;
     std::queue<std::future<size_t>> mFutureHashQueue;
-    FileReader* mFileReaderPtr;
+    FileReader& mFileReaderPtr;
 };
 
 #endif // FILEWRITER_H

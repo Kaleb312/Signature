@@ -45,13 +45,10 @@ void FileReader::start()
                 mSem.wait();
                 std::string readData;
                 readData.assign(mBlockSize, 0);
-                std::cout << "FileReader: new empty data block created" <<std::endl;
                 mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
-                std::cout << "FileReader: data read success" <<std::endl;
                 {
                     std::lock_guard<std::mutex> lock(mMutex);
                     mDataBlockQueue.push(std::move(readData));
-                    std::cout << "FileReader: data pushed to queue" <<std::endl;
                 }
 
 
@@ -93,12 +90,6 @@ bool FileReader::isFinished()
 {
     std::lock_guard<std::mutex> lock(mMutex);
     return mIsFinised && mDataBlockQueue.empty();
-}
-
-bool FileReader::isDataReady()
-{
-    std::lock_guard<std::mutex> lock(mMutex);
-    return !mDataBlockQueue.empty();
 }
 
 bool FileReader::getDataBlock(std::string& dataBlock)

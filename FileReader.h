@@ -25,7 +25,6 @@ public:
     void post();
     void finish();
     bool isFinished();
-    bool isDataReady();
     bool getDataBlock(std::string& dataBlock);
 
 private:
