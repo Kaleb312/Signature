@@ -1,7 +1,7 @@
 #include "Semaphore.h"
 
-Semaphore::Semaphore(int count)
-    : mCount(count)
+Semaphore::Semaphore(int count) :
+    mCount(count)
 {
 }
 
@@ -20,10 +20,4 @@ void Semaphore::wait()
         mCv.wait(lock);
     }
     mCount--;
-}
-
-int Semaphore::getCount()
-{
-    std::unique_lock<std::mutex> lock(mMutex);
-    return mCount;
 }

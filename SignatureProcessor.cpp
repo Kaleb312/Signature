@@ -31,17 +31,6 @@ void SignatureProcessor::calcSignature()
                 mFileWriter.post();
                 std::cout << "SignatureProcessor: FileWriter.post()" <<std::endl;
             }
-//            if (mFileReader.isDataReady())
-//            {
-//                auto dataBlock = mFileReader.getDataBlock();
-//                std::cout << "SignatureProcessor: dataBlock.size = " << dataBlock.size() <<std::endl;
-//                auto futureHash = mThreadPool.processDataBlock(std::move(dataBlock));
-//                std::cout << "SignatureProcessor: got future of hash" <<std::endl;
-//                mFileWriter.pushFutureInQueue(std::move(futureHash));
-//                std::cout << "SignatureProcessor: future pushed to queue" <<std::endl;
-//                mFileWriter.post();
-//                std::cout << "SignatureProcessor: FileWriter.post()" <<std::endl;
-//            }
         }
         mFileWriter.finish();
         std::cout << "SignatureProcessor: FileWriter.finish()" <<std::endl;

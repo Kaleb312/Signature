@@ -42,7 +42,6 @@ void FileReader::start()
                 {
                     break;
                 }
-                std::cout << "FileReader: mSem.count = " << mSem.getCount() <<std::endl;
                 mSem.wait();
                 std::string readData;
                 readData.assign(mBlockSize, 0);
@@ -101,28 +100,6 @@ bool FileReader::isDataReady()
     std::lock_guard<std::mutex> lock(mMutex);
     return !mDataBlockQueue.empty();
 }
-
-//std::string FileReader::getDataBlock()
-//{
-//    std::string returnValue;
-//    try
-//    {
-//        std::lock_guard<std::mutex> lock(mMutex);
-//        if (!mDataBlockQueue.empty())
-//        {
-//            returnValue = std::move(mDataBlockQueue.front());
-//            mDataBlockQueue.pop();
-//        }
-//    }
-//    catch (const std::exception& e)
-//    {
-//        mStopFlag = true;
-//        mIsFinised = true;
-//        std::cout << "\nFileReader getDataBlock() function exception caught: " << e.what() <<std::endl;
-//        std::exit(EXIT_FAILURE);
-//    }
-//    return returnValue;
-//}
 
 bool FileReader::getDataBlock(std::string& dataBlock)
 {

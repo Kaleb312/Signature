@@ -11,7 +11,6 @@ public:
     Semaphore (int count = 0);
     void post();
     void wait();
-    int getCount();
 
 private:
     std::mutex mMutex;
