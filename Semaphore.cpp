@@ -1,7 +1,7 @@
 #include "Semaphore.h"
 
-Semaphore::Semaphore(int count)
-    : mCount(count)
+Semaphore::Semaphore(int count) :
+    mCount(count)
 {
 }
 

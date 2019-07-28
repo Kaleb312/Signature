@@ -2,7 +2,7 @@
 
 SignatureProcessor::SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize) :
     mFileReader(inFile, blockSize),
-    mFileWriter(outFile),
+    mFileWriter(outFile, mFileReader),
     mThreadPool(std::thread::hardware_concurrency() - 1) // one thread is for work with files
 {
 }
@@ -20,14 +20,16 @@ void SignatureProcessor::calcSignature()
     {
         while (!mFileReader.isFinished() || !mFileWriter.isFinished())
         {
-            if (mFileReader.isDataReady())
+            std::string dataBlock;
+            if (mFileReader.getDataBlock(dataBlock))
             {
-                mFileWriter.pushFutureInList(mThreadPool.processDataBlock(mFileReader.getDataBlock()));
+                auto futureHash = mThreadPool.processDataBlock(std::move(dataBlock));
+                mFileWriter.pushFutureInQueue(std::move(futureHash));
                 mFileWriter.post();
             }
         }
-        mFileReader.finish();
         mFileWriter.finish();
+        mFileReader.finish();
     }
     catch (const std::exception& e)
     {

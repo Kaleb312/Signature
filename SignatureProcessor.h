@@ -9,6 +9,7 @@ class SignatureProcessor
 {
 public:
     SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize = 1);
+    SignatureProcessor() = delete;
     bool openFiles();
     void calcSignature();
 

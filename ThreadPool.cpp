@@ -13,7 +13,7 @@ ThreadPool::ThreadPool(size_t threadsNumber) :
                 {
                     std::unique_lock<std::mutex> lock(mMutex);
                     mCv.wait(lock, [this]{return mStopFlag || !mTasks.empty();});
-                    if (mStopFlag && mTasks.empty())
+                    if (mStopFlag || mTasks.empty())
                     {
                         return;
                     }
@@ -60,9 +60,9 @@ ThreadPool::~ThreadPool()
     }
 }
 
-std::future<size_t> ThreadPool::processDataBlock(std::string&& input)
+std::future<size_t> ThreadPool::processDataBlock(std::string&& inputData)
 {
-    auto calcHash = std::make_shared<std::packaged_task<size_t()>>([input]
+    auto calcHash = std::make_shared<std::packaged_task<size_t()>>([input = std::move(inputData)]()
     {
         return std::hash<std::string>()(input);
     });

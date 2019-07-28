@@ -3,7 +3,7 @@
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
     mFileName(inFile),
     mBlockSize(MEGABYTE_SIZE * blockSize),
-    mSem(AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize)),
+    mSem((AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize))),
     mStopFlag(false),
     mIsFinised(false)
 {
@@ -42,14 +42,16 @@ void FileReader::start()
                 {
                     break;
                 }
+                mSem.wait();
                 std::string readData;
                 readData.assign(mBlockSize, 0);
                 mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
                 {
                     std::lock_guard<std::mutex> lock(mMutex);
-                    mDataBlockList.push(std::move(readData));
+                    mDataBlockQueue.push(std::move(readData));
                 }
-                mSem.wait();
+
+
             }
         }
         catch (const std::exception& e)
@@ -87,24 +89,21 @@ void FileReader::finish()
 bool FileReader::isFinished()
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return mIsFinised && mDataBlockList.empty();
+    return mIsFinised && mDataBlockQueue.empty();
 }
 
-bool FileReader::isDataReady()
+bool FileReader::getDataBlock(std::string& dataBlock)
 {
-    std::lock_guard<std::mutex> lock(mMutex);
-    return !mDataBlockList.empty();
-}
-
-std::string FileReader::getDataBlock()
-{
-    std::string returnValue;
+    bool returnValue = false;
     try
     {
         std::lock_guard<std::mutex> lock(mMutex);
-        returnValue = std::move(mDataBlockList.front());
-        mDataBlockList.pop();
-        mSem.post();
+        if (!mDataBlockQueue.empty())
+        {
+            dataBlock = std::move(mDataBlockQueue.front());
+            mDataBlockQueue.pop();
+            returnValue = true;
+        }
     }
     catch (const std::exception& e)
     {
@@ -115,3 +114,4 @@ std::string FileReader::getDataBlock()
     }
     return returnValue;
 }
+

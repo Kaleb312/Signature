@@ -26,10 +26,6 @@ public:
     ThreadPool& operator=(ThreadPool&&) = delete;
 
 private:
-//    template<class F, class... Args>
-//    auto addTask(F&& func, Args&&... args)
-//        -> std::future<typename std::result_of<F(Args...)>::type>;
-
     std::vector<std::thread> mThreads;
     std::queue<std::function<void()>> mTasks;
     std::mutex mMutex;
