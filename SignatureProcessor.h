@@ -14,8 +14,8 @@ public:
     void calcSignature();
 
 private:
-    FileReader mFileReader;
     FileWriter mFileWriter;
+    FileReader mFileReader;
     ThreadPool mThreadPool;
 };
 

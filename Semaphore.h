@@ -2,7 +2,6 @@
 #define SEMAPHORE_H
 
 #include <mutex>
-#include <iostream>
 #include <condition_variable>
 
 class Semaphore

@@ -7,7 +7,6 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
-#include <memory>
 #include <queue>
 #include "Semaphore.h"
 
