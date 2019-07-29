@@ -14,6 +14,7 @@
 class FileWriter
 {
 public:
+    FileWriter() = delete;
     FileWriter(const std::string& outFile, FileReader& fileReaderPtr);
     ~FileWriter();
     bool openFile();

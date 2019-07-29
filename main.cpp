@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
             blockSize = static_cast<unsigned int>(std::stoi(argv[3]));
             if (blockSize >= AVAILABLE_MEMORY / MEGABYTE_SIZE)
             {
-                std::cout << "Block size is too big. Try smaler than 1024 Mb" << std::endl;
+                std::cout << "Block size is too big. Try smaller than 1024 Mb" << std::endl;
                 return -1;
             }
         }
@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
     if (!proc.openFiles())
     {
         std::cout << "Error: bad input of output file" << std::endl;
+        return -1;
     }
     else
     {

@@ -57,7 +57,7 @@ void FileReader::start()
         catch (const std::exception& e)
         {
             mStopFlag = true;
-            std::cout << "\nFileReader read() function exception caught: " << e.what() <<std::endl;
+            std::cout << "\nFileReader read() exception caught: " << e.what() <<std::endl;
             std::exit(EXIT_FAILURE);
         }
         mIsFinised = true;
@@ -82,7 +82,6 @@ void FileReader::post()
 
 void FileReader::finish()
 {
-    mSem.post();
     mThread.join();
 }
 
@@ -109,7 +108,7 @@ bool FileReader::getDataBlock(std::string& dataBlock)
     {
         mStopFlag = true;
         mIsFinised = true;
-        std::cout << "\nFileReader getDataBlock() function exception caught: " << e.what() <<std::endl;
+        std::cout << "\nFileReader getDataBlock() exception caught: " << e.what() <<std::endl;
         std::exit(EXIT_FAILURE);
     }
     return returnValue;

@@ -26,7 +26,7 @@ ThreadPool::ThreadPool(size_t threadsNumber) :
             {
                 mStopFlag = true;
                 mCv.notify_all();
-                std::cout << "\nThreadPool threadTask() function exception caught: " << e.what() << std::endl;
+                std::cout << "\nThreadPool threadTask() exception caught: " << e.what() << std::endl;
                 std::exit(EXIT_FAILURE);
             }
         }
@@ -41,7 +41,7 @@ ThreadPool::ThreadPool(size_t threadsNumber) :
         {
             mStopFlag = true;
             mCv.notify_all();
-            std::cout << "\nThreadPool mThreads.emplace_back() function exception caught: " << e.what() << std::endl;
+            std::cout << "\nThreadPool mThreads.emplace_back() exception caught: " << e.what() << std::endl;
             std::exit(EXIT_FAILURE);
         }
     }

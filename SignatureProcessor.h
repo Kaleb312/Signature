@@ -8,14 +8,14 @@
 class SignatureProcessor
 {
 public:
-    SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize = 1);
     SignatureProcessor() = delete;
+    SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize = 1);
     bool openFiles();
     void calcSignature();
 
 private:
-    FileWriter mFileWriter;
     FileReader mFileReader;
+    FileWriter mFileWriter;
     ThreadPool mThreadPool;
 };
 

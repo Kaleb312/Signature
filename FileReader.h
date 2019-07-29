@@ -16,6 +16,7 @@ static constexpr auto AVAILABLE_MEMORY = 1024 * MEGABYTE_SIZE;
 class FileReader
 {
 public:
+    FileReader() = delete;
     FileReader(const std::string& inFile, unsigned int blockSize = 1);
     ~FileReader();
     bool openFile();

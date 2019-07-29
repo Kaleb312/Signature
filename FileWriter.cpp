@@ -58,7 +58,7 @@ void FileWriter::start()
         catch (const std::exception& e)
         {
             mStopFlag = true;
-            std::cout << "\nFileWriter write() function exception caught: " << e.what() <<std::endl;
+            std::cout << "\nFileWriter write() exception caught: " << e.what() <<std::endl;
             std::exit(EXIT_FAILURE);
         }
     };

@@ -35,7 +35,7 @@ void SignatureProcessor::calcSignature()
     {
         mFileReader.stop();
         mFileWriter.stop();
-        std::cout << "\nSignatureProcessor calcSignature() function exception caught: " << e.what() <<std::endl;
+        std::cout << "\nSignatureProcessor calcSignature() exception caught: " << e.what() <<std::endl;
         std::exit(EXIT_FAILURE);
     }
 }
