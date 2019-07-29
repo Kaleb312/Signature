@@ -16,23 +16,28 @@ int main(int argc, char* argv[])
     {
         try
         {
+            if (blockSize < 1)
+            {
+                std::cout << "Error: minimal allowed block size is 1 Mb" << std::endl;
+                return -1;
+            }
             blockSize = static_cast<unsigned int>(std::stoi(argv[3]));
             if (blockSize >= AVAILABLE_MEMORY / MEGABYTE_SIZE)
             {
-                std::cout << "Block size is too big. Try smaller than 1024 Mb" << std::endl;
+                std::cout << "Error: block size is too big. Try smaller than 1024 Mb" << std::endl;
                 return -1;
             }
         }
         catch (const std::exception& e)
         {
-            std::cout << "Error in block size!" << e.what() << std::endl;
+            std::cout << "Error: block size exception: " << e.what() << std::endl;
             return -1;
         }
     }
     else
     {
-        std::cout << "Wrong number of arguments! Please insert <input file> <output file> <block size>(default 1Mb)"
-            << std::endl;
+        std::cout << "Error: wrong number of arguments. "
+            "Please insert <input file> <output file> <block size>(default 1Mb)" << std::endl;
         return -1;
     }
     inputFileName = argv[1];
@@ -40,7 +45,7 @@ int main(int argc, char* argv[])
     SignatureProcessor proc(inputFileName, outputFileName, blockSize);
     if (!proc.openFiles())
     {
-        std::cout << "Error: bad input of output file" << std::endl;
+        std::cout << "Error: bad input or output file" << std::endl;
         return -1;
     }
     else
