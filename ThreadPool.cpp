@@ -1,62 +1,58 @@
 #include "ThreadPool.h"
 
-ThreadPool::ThreadPool(size_t threadsNumber) :
-    mStopFlag(false)
+ThreadPool::ThreadPool(size_t threadsNumber) : mStopFlag(false)
 {
-    auto threadTask = [this]
+    size_t counter = 0;
+    try
     {
-        while(true)
+        for (; counter < threadsNumber; ++counter)
         {
-            try
-            {
-                std::function<void()> task;
-                {
-                    std::unique_lock<std::mutex> lock(mMutex);
-                    mCv.wait(lock, [this]{return mStopFlag || !mTasks.empty();});
-                    if (mStopFlag || mTasks.empty())
-                    {
-                        return;
-                    }
-                    task = std::move(mTasks.front());
-                    mTasks.pop();
-                }
-                task();
-            }
-            catch (const std::exception& e)
-            {
-                mStopFlag = true;
-                mCv.notify_all();
-                std::cout << "\nThreadPool threadTask() exception caught: " << e.what() << std::endl;
-                std::exit(EXIT_FAILURE);
-            }
+            mThreads.emplace_back([this](){threadTask();});
         }
-    };
-    for (size_t i = 0; i < threadsNumber; ++i)
+    }
+    catch (const std::exception& e)
     {
-        try
-        {
-            mThreads.emplace_back(threadTask);
-        }
-        catch (const std::exception& e)
-        {
-            mStopFlag = true;
-            mCv.notify_all();
-            std::cout << "\nThreadPool mThreads.emplace_back() exception caught: " << e.what() << std::endl;
-            std::exit(EXIT_FAILURE);
-        }
+        std::cout << "\nThreadPool::mThreads.emplace_back() exception caught: " << e.what() << std::endl;
+        std::cout << "Program will continue work with " << std::to_string(counter) << " threads" << std::endl;
     }
 }
 
 ThreadPool::~ThreadPool()
 {
-    {
-        std::unique_lock<std::mutex> lock(mMutex);
-        mStopFlag = true;
-    }
+    mStopFlag = true;
     mCv.notify_all();
     for (auto& thread : mThreads)
     {
         thread.join();
+    }
+}
+
+void ThreadPool::threadTask()
+{
+    while(true)
+    {
+        std::function<void()> task;
+        {
+            std::unique_lock<std::mutex> lock(mMutex);
+            mCv.wait(lock, [this]{return mStopFlag || !mTasks.empty();});
+            if (mStopFlag || mTasks.empty())
+            {
+                return;
+            }
+            task = std::move(mTasks.front());
+            mTasks.pop();
+        }
+        try
+        {
+            task();
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "\nThreadPool::threadTask() exception caught: " << e.what() << std::endl;
+            std::cout << "Program will be stopped" << std::endl;
+            mStopFlag = true;
+            mCv.notify_all();
+        }
     }
 }
 

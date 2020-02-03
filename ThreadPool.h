@@ -24,6 +24,8 @@ public:
     ThreadPool& operator=(ThreadPool&&) = delete;
 
 private:
+    void threadTask();
+
     std::vector<std::thread> mThreads;
     std::queue<std::function<void()>> mTasks;
     std::mutex mMutex;
