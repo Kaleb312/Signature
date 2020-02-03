@@ -14,10 +14,10 @@
 class ThreadPool
 {
 public:
-    ThreadPool(size_t threadsNumber);
+    ThreadPool();
     ~ThreadPool();
+    bool init(size_t threadsNumber);
     std::future<size_t> processDataBlock(std::string&& input);
-    ThreadPool() = delete;
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool(ThreadPool&&) = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
@@ -27,7 +27,7 @@ private:
     void threadTask();
 
     std::vector<std::thread> mThreads;
-    std::queue<std::function<void()>> mTasks;
+    std::queue<std::function<void()>> mTasksQueue;
     std::mutex mMutex;
     std::condition_variable mCv;
     std::atomic<bool> mStopFlag;

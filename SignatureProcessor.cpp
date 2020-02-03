@@ -2,9 +2,17 @@
 
 SignatureProcessor::SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize) :
     mFileReader(inFile, blockSize),
-    mFileWriter(outFile, mFileReader),
-    mThreadPool(std::thread::hardware_concurrency() - 1) // one thread is for work with files
+    mFileWriter(outFile, mFileReader)
 {
+    int notBusyCores = std::thread::hardware_concurrency() - 3;
+    if (notBusyCores > 3) // thread writer, thread reader, main thread are busy; the rest cores can be used in thread pool
+    {
+        mThreadPool.init(notBusyCores);
+    }
+    else
+    {
+        mThreadPool.init(1);
+    }
 }
 
 bool SignatureProcessor::openFiles()

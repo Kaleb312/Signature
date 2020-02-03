@@ -1,20 +1,7 @@
 #include "ThreadPool.h"
 
-ThreadPool::ThreadPool(size_t threadsNumber) : mStopFlag(false)
+ThreadPool::ThreadPool() : mStopFlag(false)
 {
-    size_t counter = 0;
-    try
-    {
-        for (; counter < threadsNumber; ++counter)
-        {
-            mThreads.emplace_back([this](){threadTask();});
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << "\nThreadPool::mThreads.emplace_back() exception caught: " << e.what() << std::endl;
-        std::cout << "Program will continue work with " << std::to_string(counter) << " threads" << std::endl;
-    }
 }
 
 ThreadPool::~ThreadPool()
@@ -27,6 +14,25 @@ ThreadPool::~ThreadPool()
     }
 }
 
+bool ThreadPool::init(size_t threadsNumber)
+{
+    size_t counter = 0;
+    try
+    {
+        mThreads.reserve(threadsNumber);
+        for (; counter < threadsNumber; ++counter)
+        {
+            mThreads.emplace_back([this](){threadTask();});
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "\nThreadPool::mThreads.emplace_back() exception caught: " << e.what() << std::endl;
+        std::cout << "Program will continue work with " << std::to_string(counter) << " threads" << std::endl;
+    }
+    return counter != 0;
+}
+
 void ThreadPool::threadTask()
 {
     while(true)
@@ -34,13 +40,13 @@ void ThreadPool::threadTask()
         std::function<void()> task;
         {
             std::unique_lock<std::mutex> lock(mMutex);
-            mCv.wait(lock, [this]{return mStopFlag || !mTasks.empty();});
-            if (mStopFlag || mTasks.empty())
+            mCv.wait(lock, [this]{return mStopFlag || !mTasksQueue.empty();});
+            if (mStopFlag || mTasksQueue.empty())
             {
                 return;
             }
-            task = std::move(mTasks.front());
-            mTasks.pop();
+            task = std::move(mTasksQueue.front());
+            mTasksQueue.pop();
         }
         try
         {
@@ -69,7 +75,7 @@ std::future<size_t> ThreadPool::processDataBlock(std::string&& inputData)
         {
             throw std::runtime_error("Adding task in stopped thread pool");
         }
-        mTasks.emplace([calcHash](){(*calcHash)();});
+        mTasksQueue.emplace([calcHash](){(*calcHash)();});
     }
     mCv.notify_one();
     return result;
