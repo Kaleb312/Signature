@@ -12,8 +12,9 @@ bool SignatureProcessor::openFiles()
     return mFileReader.openFile() && mFileWriter.openFile();
 }
 
-void SignatureProcessor::calcSignature()
+ReturnValue SignatureProcessor::calcSignature()
 {
+    ReturnValue result = ReturnValue::FAILURE;
     mFileReader.start();
     mFileWriter.start();
     try
@@ -30,12 +31,13 @@ void SignatureProcessor::calcSignature()
         }
         mFileWriter.finish();
         mFileReader.finish();
+        result = ReturnValue::SUCCESS;
     }
     catch (const std::exception& e)
     {
         mFileReader.stop();
         mFileWriter.stop();
         std::cout << "\nSignatureProcessor calcSignature() exception caught: " << e.what() <<std::endl;
-        std::exit(EXIT_FAILURE);
     }
+    return result;
 }

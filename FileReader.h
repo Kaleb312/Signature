@@ -13,6 +13,12 @@
 static constexpr auto MEGABYTE_SIZE = 1024 * 1024;
 static constexpr auto AVAILABLE_MEMORY = 1024 * MEGABYTE_SIZE;
 
+enum class ReturnValue
+{
+    SUCCESS = 0,
+    FAILURE = 1
+};
+
 class FileReader
 {
 public:
