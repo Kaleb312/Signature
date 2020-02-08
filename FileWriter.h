@@ -22,7 +22,7 @@ public:
     void post();
     void finish();
     void pushFutureInQueue(std::future<size_t>&& future);
-    bool isFinished();
+    bool isFinished() const;
 
 private:
     void write();
@@ -31,7 +31,7 @@ private:
     std::string mFileName;
     Semaphore mSem;
     std::thread mThread;
-    std::mutex mMutex;
+    mutable std::mutex mMutex;
     std::atomic<bool> mStopFlag = false;
     std::queue<std::future<size_t>> mFutureHashQueue;
     FileReader& mFileReaderPtr;
