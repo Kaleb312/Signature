@@ -11,7 +11,7 @@ public:
     SignatureProcessor() = delete;
     SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize = 1);
     bool openFiles();
-    ReturnValue calcSignature();
+    bool calcSignature();
 
 private:
     FileReader mFileReader;

@@ -7,14 +7,15 @@
 class Semaphore
 {
 public:
-    Semaphore (int count = 0);
+    Semaphore ();
+    Semaphore (int count);
     void post();
     void wait();
 
 private:
     std::mutex mMutex;
     std::condition_variable mCv;
-    int mCount;
+    int mCount = 0;
 };
 
 #endif // SEMAPHORE_H

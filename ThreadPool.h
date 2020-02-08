@@ -16,7 +16,7 @@ class ThreadPool
 public:
     ThreadPool();
     ~ThreadPool();
-    bool init(size_t threadsNumber);
+    bool init(size_t threadsNumber = 1);
     std::future<size_t> processDataBlock(std::string&& input);
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool(ThreadPool&&) = delete;

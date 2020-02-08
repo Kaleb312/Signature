@@ -43,15 +43,15 @@ int main(int argc, char* argv[])
     inputFileName = argv[1];
     outputFileName = argv[2];
     SignatureProcessor signatureProcessor(inputFileName, outputFileName, blockSize);
-    int result = -1;
+    bool result = false;
     if (!signatureProcessor.openFiles())
     {
         std::cout << "Error: bad input or output file" << std::endl;
     }
     else
     {
-        result = static_cast<int>(signatureProcessor.calcSignature());
+        result = signatureProcessor.calcSignature();
     }
-    std::cout << "\nFinished: " << (result ? "FAILURE" : "SUCCESS") << std::endl;
+    std::cout << "\nFinished: " << (result ? "SUCCESS" : "FAILURE") << std::endl;
     return 0;
 }

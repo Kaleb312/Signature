@@ -3,9 +3,7 @@
 FileReader::FileReader(const std::string& inFile, unsigned int blockSize) :
     mFileName(inFile),
     mBlockSize(MEGABYTE_SIZE * blockSize),
-    mSem((AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize))),
-    mStopFlag(false),
-    mIsFinised(false)
+    mSem((AVAILABLE_MEMORY / (MEGABYTE_SIZE * blockSize)))
 {
 }
 
@@ -32,37 +30,7 @@ bool FileReader::openFile()
 
 void FileReader::start()
 {
-    auto read = [this]()
-    {
-        try
-        {
-            while (mFin)
-            {
-                if (mStopFlag)
-                {
-                    break;
-                }
-                mSem.wait();
-                std::string readData;
-                readData.assign(mBlockSize, 0);
-                mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
-                {
-                    std::lock_guard<std::mutex> lock(mMutex);
-                    mDataBlockQueue.push(std::move(readData));
-                }
-
-
-            }
-        }
-        catch (const std::exception& e)
-        {
-            mStopFlag = true;
-            std::cout << "\nFileReader read() exception caught: " << e.what() <<std::endl;
-            std::exit(EXIT_FAILURE);
-        }
-        mIsFinised = true;
-    };
-    mThread = std::thread(read);
+    mThread = std::thread([this](){read();});
 }
 
 void FileReader::stop()
@@ -85,7 +53,7 @@ void FileReader::finish()
     mThread.join();
 }
 
-bool FileReader::isFinished()
+bool FileReader::isFinished() const
 {
     std::lock_guard<std::mutex> lock(mMutex);
     return mIsFinised && mDataBlockQueue.empty();
@@ -107,10 +75,35 @@ bool FileReader::getDataBlock(std::string& dataBlock)
     catch (const std::exception& e)
     {
         mStopFlag = true;
-        mIsFinised = true;
         std::cout << "\nFileReader getDataBlock() exception caught: " << e.what() <<std::endl;
-        std::exit(EXIT_FAILURE);
     }
     return returnValue;
 }
 
+void FileReader::read()
+{
+    try
+    {
+        while (mFin)
+        {
+            if (mStopFlag)
+            {
+                break;
+            }
+            mSem.wait();
+            std::string readData;
+            readData.assign(mBlockSize, 0);
+            mFin.read(&readData.at(0), static_cast<int>(mBlockSize));
+            {
+                std::lock_guard<std::mutex> lock(mMutex);
+                mDataBlockQueue.push(std::move(readData));
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        mStopFlag = true;
+        std::cout << "\nFileReader read() exception caught: " << e.what() <<std::endl;
+    }
+    mIsFinised = true;
+}

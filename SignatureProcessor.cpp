@@ -13,7 +13,7 @@ SignatureProcessor::SignatureProcessor(const std::string& inFile, const std::str
     }
     else
     {
-        mThreadPool.init(1);
+        mThreadPool.init();
     }
 }
 
@@ -22,9 +22,9 @@ bool SignatureProcessor::openFiles()
     return mFileReader.openFile() && mFileWriter.openFile();
 }
 
-ReturnValue SignatureProcessor::calcSignature()
+bool SignatureProcessor::calcSignature()
 {
-    ReturnValue result = ReturnValue::FAILURE;
+    bool result = false;
     mFileReader.start();
     mFileWriter.start();
     try
@@ -41,7 +41,7 @@ ReturnValue SignatureProcessor::calcSignature()
         }
         mFileWriter.finish();
         mFileReader.finish();
-        result = ReturnValue::SUCCESS;
+        result = true;
     }
     catch (const std::exception& e)
     {

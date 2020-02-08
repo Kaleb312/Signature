@@ -14,7 +14,6 @@
 class FileWriter
 {
 public:
-    FileWriter() = delete;
     FileWriter(const std::string& outFile, FileReader& fileReaderPtr);
     ~FileWriter();
     bool openFile();
@@ -26,12 +25,14 @@ public:
     bool isFinished();
 
 private:
+    void write();
+
     std::ofstream mFout;
     std::string mFileName;
     Semaphore mSem;
     std::thread mThread;
     std::mutex mMutex;
-    std::atomic<bool> mStopFlag;
+    std::atomic<bool> mStopFlag = false;
     std::queue<std::future<size_t>> mFutureHashQueue;
     FileReader& mFileReaderPtr;
 };
