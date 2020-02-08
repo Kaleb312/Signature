@@ -1,11 +1,13 @@
 #include "SignatureProcessor.h"
 
+static const unsigned int ALWAYS_BUSY_THREADS_NUMBER = 3;
+
 SignatureProcessor::SignatureProcessor(const std::string& inFile, const std::string& outFile, unsigned int blockSize) :
     mFileReader(inFile, blockSize),
     mFileWriter(outFile, mFileReader)
 {
-    int notBusyCores = std::thread::hardware_concurrency() - 3;
-    if (notBusyCores > 3) // thread writer, thread reader, main thread are busy; the rest cores can be used in thread pool
+    const unsigned int notBusyCores = std::thread::hardware_concurrency() - ALWAYS_BUSY_THREADS_NUMBER;
+    if (notBusyCores > ALWAYS_BUSY_THREADS_NUMBER) // thread writer, thread reader, main thread are busy; the rest cores can be used in thread pool
     {
         mThreadPool.init(notBusyCores);
     }
