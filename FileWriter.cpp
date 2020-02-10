@@ -68,7 +68,7 @@ void FileWriter::pushFutureInQueue(std::future<size_t>&& future)
 bool FileWriter::isFinished() const
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return mFutureHashQueue.empty();
+    return mStopFlag || mFutureHashQueue.empty();
 }
 
 void FileWriter::write()

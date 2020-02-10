@@ -56,7 +56,7 @@ void FileReader::finish()
 bool FileReader::isFinished() const
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    return mIsFinised && mDataBlockQueue.empty();
+    return mStopFlag || (mIsFinised && mDataBlockQueue.empty());
 }
 
 bool FileReader::getDataBlock(std::string& dataBlock)
